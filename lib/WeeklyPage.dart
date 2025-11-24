@@ -1,0 +1,25 @@
+import 'package:flutter/material.dart';
+
+class WeeklyPage extends StatelessWidget {
+  final String location;
+  const WeeklyPage({super.key, required this.location});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // centers the column vertically
+        children: [
+          Text(
+            "Weekly",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            location.isEmpty ? '' : location,
+            style: TextStyle(fontSize: 24),
+          ),
+        ],
+      ),
+    );
+  }
+}
