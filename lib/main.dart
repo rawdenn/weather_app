@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'weather_app.dart';
+import 'package:geolocator/geolocator.dart';
 import 'CurrentlyPage.dart';
 import 'TodayPage.dart';
 import 'WeeklyPage.dart';
@@ -19,10 +19,6 @@ class WeatherApp extends StatelessWidget {
         brightness: Brightness.light,
         primaryColor: Colors.blue,
         scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue, // light-colored app bar
-          foregroundColor: Colors.white, // text & icon color
-        ),
       ),
       home: const WeatherHomePage(),
       debugShowCheckedModeBanner: false,
@@ -41,6 +37,45 @@ class _WeatherHomePageState extends State<WeatherHomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String locationInput = "";
+  String? errorMessage;
+  String? coordinates;
+
+  Future<void> fetchLocation() async {
+    setState(() {
+      errorMessage = null;
+      coordinates = null;
+    });
+
+    LocationPermission permission;
+
+    permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.denied) {
+      setState(() {
+        errorMessage = "Location permissions are denied.";
+      });
+      return;
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        errorMessage =
+            "Location permissions are permanently denied. Enable them in settings.";
+      });
+      return;
+    }
+
+    // Get coordinates
+    Position position = await Geolocator.getCurrentPosition();
+
+    setState(() {
+      coordinates = "${position.latitude}, ${position.longitude}";
+    });
+  }
 
   @override
   void initState() {
@@ -49,7 +84,42 @@ class _WeatherHomePageState extends State<WeatherHomePage>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    Widget bodyContent;
+
+    if (errorMessage != null) {
+      bodyContent = Center(
+        child: Text(
+          errorMessage!,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else if (coordinates != null) {
+      bodyContent = Center(
+        child: Text(
+          "Coordinates:\n$coordinates",
+          style: const TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else {
+      bodyContent = TabBarView(
+        controller: _tabController,
+        children: [
+          CurrentlyPage(location: locationInput),
+          TodayPage(location: locationInput),
+          WeeklyPage(location: locationInput),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 10,
@@ -65,46 +135,27 @@ class _WeatherHomePageState extends State<WeatherHomePage>
                 },
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search, color: Colors.white),
-                  filled: true,
-                  fillColor:
-                      Colors.transparent,
                   hintText: "Search city...",
                   hintStyle: TextStyle(color: Colors.grey[300]),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: const TextStyle(
-                  color: Colors.white,
-                ),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.location_on, color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  locationInput = "Geolocation";
-                });
-              },
+              onPressed: () => fetchLocation(),
             ),
           ],
         ),
       ),
 
-      // ---------------- TAB CONTENT ----------------
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          CurrentlyPage(location: locationInput),
-          TodayPage(location: locationInput),
-          WeeklyPage(location: locationInput),
-        ],
-      ),
+      body: bodyContent,
 
-      // ---------------- BOTTOM BAR ----------------
       bottomNavigationBar: BottomAppBar(
         color: Colors.blueGrey[900],
         child: TabBar(
