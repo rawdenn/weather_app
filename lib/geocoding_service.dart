@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 
 class GeocodingService {
   static Future<List<Map<String, dynamic>>> fetchCitySuggestions(
-      String query) async {
+    String query,
+  ) async {
     if (query.isEmpty) return [];
 
     final url =

@@ -88,12 +88,14 @@ class WeatherService {
 
       List<HourlyWeather> hourly = [];
       for (int i = 0; i < hourlyTemps.length; i++) {
-        hourly.add(HourlyWeather(
-time: hourlyTimes[i].toString(), // keep full ISO date string
-          temperature: (hourlyTemps[i] as num).toDouble(),
-          windSpeed: (hourlyWinds[i] as num).toDouble(),
-          description: _mapWeatherCode(hourlyCodes[i]),
-        ));
+        hourly.add(
+          HourlyWeather(
+            time: hourlyTimes[i].toString(), // keep full ISO date string
+            temperature: (hourlyTemps[i] as num).toDouble(),
+            windSpeed: (hourlyWinds[i] as num).toDouble(),
+            description: _mapWeatherCode(hourlyCodes[i]),
+          ),
+        );
       }
 
       // Daily
@@ -104,12 +106,14 @@ time: hourlyTimes[i].toString(), // keep full ISO date string
 
       List<DailyWeather> daily = [];
       for (int i = 0; i < dailyMax.length; i++) {
-        daily.add(DailyWeather(
-          date: dailyDates[i],
-          minTemp: (dailyMin[i] as num).toDouble(),
-          maxTemp: (dailyMax[i] as num).toDouble(),
-          description: _mapWeatherCode(dailyCodes[i]),
-        ));
+        daily.add(
+          DailyWeather(
+            date: dailyDates[i],
+            minTemp: (dailyMin[i] as num).toDouble(),
+            maxTemp: (dailyMax[i] as num).toDouble(),
+            description: _mapWeatherCode(dailyCodes[i]),
+          ),
+        );
       }
 
       return WeatherData(

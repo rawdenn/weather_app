@@ -26,10 +26,7 @@ class CurrentlyPage extends StatelessWidget {
             "${weather!.temperature} °C",
             style: const TextStyle(fontSize: 24),
           ),
-          Text(
-            weather!.description,
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text(weather!.description, style: const TextStyle(fontSize: 18)),
           Text(
             "Wind: ${weather!.windSpeed} km/h",
             style: const TextStyle(fontSize: 16),

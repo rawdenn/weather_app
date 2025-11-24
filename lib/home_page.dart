@@ -50,8 +50,11 @@ class _WeatherHomePageState extends State<WeatherHomePage>
       return;
     }
     if (permission == LocationPermission.deniedForever) {
-      setState(() => errorMessage =
-          "Location permissions are permanently denied. Enable them in settings.");
+      setState(
+        () =>
+            errorMessage =
+                "Location permissions are permanently denied. Enable them in settings.",
+      );
       return;
     }
 
@@ -73,7 +76,10 @@ class _WeatherHomePageState extends State<WeatherHomePage>
   }
 
   Future<void> fetchWeatherForCoordinates(
-      double lat, double lon, String city) async {
+    double lat,
+    double lon,
+    String city,
+  ) async {
     setState(() => errorMessage = null);
     final weather = await WeatherService.fetchWeather(
       latitude: lat,
