@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+
 class GeocodingService {
   static Future<List<Map<String, dynamic>>> fetchCitySuggestions(
     String query,

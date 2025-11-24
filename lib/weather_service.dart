@@ -6,6 +6,7 @@ class WeatherData {
   final String city;
   final String region;
   final String country;
+  final int isDay;
   final double temperature;
   final String description;
   final double windSpeed;
@@ -16,6 +17,7 @@ class WeatherData {
     required this.city,
     required this.region,
     required this.country,
+    required this.isDay,
     required this.temperature,
     required this.description,
     required this.windSpeed,
@@ -79,7 +81,7 @@ class WeatherService {
       final temperature = (current['temperature'] as num).toDouble();
       final windSpeed = (current['windspeed'] as num).toDouble();
       final description = _mapWeatherCode(current['weathercode']);
-
+      final isDay = (current['is_day'] as num).toInt(); 
       // Hourly
       final hourlyTemps = data['hourly']['temperature_2m'] as List;
       final hourlyCodes = data['hourly']['weathercode'] as List;
@@ -120,6 +122,7 @@ class WeatherService {
         city: city,
         region: region,
         country: country,
+        isDay: isDay,
         temperature: temperature,
         windSpeed: windSpeed,
         description: description,

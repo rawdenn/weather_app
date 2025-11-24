@@ -63,7 +63,7 @@ class _WeatherHomePageState extends State<WeatherHomePage>
       await fetchWeatherForCoordinates(
         position.latitude,
         position.longitude,
-        "Current Location",
+        "Lebanon",
       );
     } catch (e) {
       setState(() => errorMessage = "Failed to get location: $e");
@@ -120,6 +120,9 @@ class _WeatherHomePageState extends State<WeatherHomePage>
   @override
   Widget build(BuildContext context) {
     Widget bodyContent;
+    final bool isDay = weatherData?.isDay == 1;
+    final Color textColor = isDay ? Colors.black : Colors.white;
+    final Color iconColor = isDay ? Colors.black87 : Colors.white;
 
     if (errorMessage != null) {
       bodyContent = Center(child: Text(errorMessage!));
@@ -129,69 +132,86 @@ class _WeatherHomePageState extends State<WeatherHomePage>
       bodyContent = TabBarView(
         controller: _tabController,
         children: [
-          CurrentlyPage(weather: weatherData),
-          TodayPage(weather: weatherData),
-          WeeklyPage(weather: weatherData),
+          CurrentlyPage(weather: weatherData, textColor: textColor),
+          TodayPage(weather: weatherData, textColor: textColor),
+          WeeklyPage(weather: weatherData, textColor: textColor),
         ],
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blueGrey[900],
-        titleSpacing: 10,
-        title: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                onChanged: (value) {
-                  setState(() => locationInput = value);
-                  updateSuggestions(value);
-                },
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search, color: Colors.white),
-                  hintText: "Search city...",
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  filled: true,
-                  fillColor: Colors.transparent,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+            isDay ? "assets/day_bg.png" : "assets/night_bg.png",
+          ),
+          fit: BoxFit.cover,
+        ),
+      ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            titleSpacing: 10,
+            title: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() => locationInput = value);
+                      updateSuggestions(value);
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search, color: iconColor),
+                      hintText: "Search city...",
+                      hintStyle: TextStyle(color: textColor.withOpacity(0.7)),
+                      filled: true,
+                      fillColor:
+                          Colors
+                              .black26, // optional semi-transparent background
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    style: TextStyle(color: textColor),
                   ),
                 ),
-                style: const TextStyle(color: Colors.white),
-              ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.location_on, color: iconColor),
+                  onPressed: fetchLocation,
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.location_on, color: Colors.white),
-              onPressed: fetchLocation,
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          CitySuggestionList(
-            suggestions: suggestions,
-            onCitySelected: fetchWeatherForCity,
           ),
-          Expanded(child: bodyContent),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.blueGrey[900],
-        child: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.blue,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(icon: Icon(Icons.wb_sunny), text: "Currently"),
-            Tab(icon: Icon(Icons.today), text: "Today"),
-            Tab(icon: Icon(Icons.calendar_view_week), text: "Weekly"),
-          ],
+
+          body: Column(
+            children: [
+              CitySuggestionList(
+                suggestions: suggestions,
+                onCitySelected: fetchWeatherForCity,
+              ),
+              Expanded(child: bodyContent),
+            ],
+          ),
+          bottomNavigationBar: BottomAppBar(
+            color: Colors.transparent,
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.blue,
+              labelColor: textColor,
+              unselectedLabelColor: textColor.withOpacity(0.6),
+              tabs: const [
+                Tab(icon: Icon(Icons.wb_sunny), text: "Currently"),
+                Tab(icon: Icon(Icons.today), text: "Today"),
+                Tab(icon: Icon(Icons.calendar_view_week), text: "Weekly"),
+              ],
+            ),
+          ),
         ),
-      ),
+      
     );
   }
 }
